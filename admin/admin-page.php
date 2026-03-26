@@ -157,6 +157,10 @@ $activity = PMS_Gift_Articles_Admin::get_instance()->get_recent_activity();
                 <span id="pms-admin-reset-msg" style="margin-left: 10px;"></span>
             </div>
         </div>
+
+        <div class="pms-gift-admin-footer" style="margin-top: 20px; text-align: right; font-style: italic; color: #777;">
+            <p><?php printf( __( 'Developed by %s', 'pms-gift-articles' ), '<a href="https://mehmetalicakmak.me" target="_blank">Mehmet Ali ÇAKMAK</a>' ); ?></p>
+        </div>
     </div>
 
     <script>
