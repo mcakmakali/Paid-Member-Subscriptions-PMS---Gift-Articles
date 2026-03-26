@@ -108,7 +108,7 @@ class PMS_Gift_Articles_Frontend {
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'pms_generate_gift_link_nonce' ),
             'i18n'     => array(
-                'copy_success' => __( 'Link kopyalandı! Paylaşmaya hazır.', 'pms-gift-articles' ),
+                'copy_success' => get_option( 'pms_gift_articles_copy_success_msg', __( 'Link kopyalandı! Paylaşmaya hazır.', 'pms-gift-articles' ) ),
                 'error'        => __( 'Bir hata oluştu, lütfen tekrar deneyin.', 'pms-gift-articles' ),
                 'remaining'    => __( 'Bu ay %d hediye hakkınız kaldı.', 'pms-gift-articles' ),
                 'button_text'  => get_option( 'pms_gift_articles_button_text', __( 'Hediye Et', 'pms-gift-articles' ) )
@@ -122,12 +122,15 @@ class PMS_Gift_Articles_Frontend {
     public function render_modal() {
         if ( ! is_user_logged_in() ) return;
 
+        $modal_title = get_option( 'pms_gift_articles_modal_title', __( 'Makaleyi Hediye Et', 'pms-gift-articles' ) );
+        $modal_desc  = get_option( 'pms_gift_articles_modal_desc', __( 'Bu makaleyi hediye etmek için aşağıdaki linki kopyalayın:', 'pms-gift-articles' ) );
+
         ?>
         <div id="pms-gift-modal" class="pms-gift-modal">
             <div class="pms-gift-modal-content">
                 <span class="pms-gift-modal-close">&times;</span>
-                <h3><?php _e( 'Makaleyi Hediye Et', 'pms-gift-articles' ); ?></h3>
-                <p><?php _e( 'Bu makaleyi hediye etmek için aşağıdaki linki kopyalayın:', 'pms-gift-articles' ); ?></p>
+                <h3><?php echo esc_html( $modal_title ); ?></h3>
+                <p><?php echo esc_html( $modal_desc ); ?></p>
                 <div class="pms-gift-link-container">
                     <input type="text" id="pms-gift-link-input" readonly>
                     <button id="pms-gift-copy-btn"><?php _e( 'Kopyala', 'pms-gift-articles' ); ?></button>

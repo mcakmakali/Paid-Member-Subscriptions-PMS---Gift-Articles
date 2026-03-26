@@ -41,6 +41,9 @@ class PMS_Gift_Articles_Admin {
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_credits_per_month' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_token_expiry_days' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_button_text' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_modal_title' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_modal_desc' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_copy_success_msg' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_enabled_post_types' );
     }
 

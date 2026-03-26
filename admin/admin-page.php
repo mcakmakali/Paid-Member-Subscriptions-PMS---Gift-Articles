@@ -3,11 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$credits_per_month = get_option( 'pms_gift_articles_credits_per_month', 5 );
-$token_expiry_days = get_option( 'pms_gift_articles_token_expiry_days', 30 );
-$button_text       = get_option( 'pms_gift_articles_button_text', __( 'Hediye Et', 'pms-gift-articles' ) );
+$credits_per_month  = get_option( 'pms_gift_articles_credits_per_month', 5 );
+$token_expiry_days  = get_option( 'pms_gift_articles_token_expiry_days', 30 );
+$button_text        = get_option( 'pms_gift_articles_button_text', __( 'Hediye Et', 'pms-gift-articles' ) );
+$modal_title        = get_option( 'pms_gift_articles_modal_title', __( 'Makaleyi Hediye Et', 'pms-gift-articles' ) );
+$modal_desc         = get_option( 'pms_gift_articles_modal_desc', __( 'Bu makaleyi hediye etmek için aşağıdaki linki kopyalayın:', 'pms-gift-articles' ) );
+$copy_success_msg   = get_option( 'pms_gift_articles_copy_success_msg', __( 'Link kopyalandı! Paylaşmaya hazır.', 'pms-gift-articles' ) );
 $enabled_post_types = get_option( 'pms_gift_articles_enabled_post_types', array( 'post' ) );
-$all_post_types = get_post_types( array( 'public' => true ), 'objects' );
+$all_post_types     = get_post_types( array( 'public' => true ), 'objects' );
 
 $activity = PMS_Gift_Articles_Admin::get_instance()->get_recent_activity();
 ?>
@@ -48,11 +51,29 @@ $activity = PMS_Gift_Articles_Admin::get_instance()->get_recent_activity();
             <?php settings_fields( 'pms_gift_articles_settings' ); ?>
             
             <table class="form-table">
+                <tr>
+                    <th colspan="2"><h3><?php _e( 'Button & Modal Texts', 'pms-gift-articles' ); ?></h3></th>
+                </tr>
                 <tr valign="top">
                     <th scope="row"><?php _e( 'Button Text', 'pms-gift-articles' ); ?></th>
                     <td><input type="text" name="pms_gift_articles_button_text" value="<?php echo esc_attr( $button_text ); ?>" class="regular-text" /></td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e( 'Modal Title', 'pms-gift-articles' ); ?></th>
+                    <td><input type="text" name="pms_gift_articles_modal_title" value="<?php echo esc_attr( $modal_title ); ?>" class="regular-text" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e( 'Modal Description', 'pms-gift-articles' ); ?></th>
+                    <td><textarea name="pms_gift_articles_modal_desc" class="regular-text" rows="2"><?php echo esc_textarea( $modal_desc ); ?></textarea></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e( 'Copy Success Message', 'pms-gift-articles' ); ?></th>
+                    <td><input type="text" name="pms_gift_articles_copy_success_msg" value="<?php echo esc_attr( $copy_success_msg ); ?>" class="regular-text" /></td>
+                </tr>
 
+                <tr>
+                    <th colspan="2"><h3><?php _e( 'Core Settings', 'pms-gift-articles' ); ?></h3></th>
+                </tr>
                 <tr valign="top">
                     <th scope="row"><?php _e( 'Global credits per month', 'pms-gift-articles' ); ?></th>
                     <td><input type="number" name="pms_gift_articles_credits_per_month" value="<?php echo esc_attr( $credits_per_month ); ?>" /></td>
@@ -94,8 +115,16 @@ $activity = PMS_Gift_Articles_Admin::get_instance()->get_recent_activity();
                     <?php if ( $activity ) : ?>
                         <?php foreach ( $activity as $item ) : ?>
                             <tr>
-                                <td><?php echo esc_html( $item->user_login ); ?></td>
-                                <td><?php echo esc_html( $item->post_title ); ?></td>
+                                <td>
+                                    <a href="<?php echo esc_url( get_edit_user_link( $item->gifter_user_id ) ); ?>">
+                                        <?php echo esc_html( $item->user_login ); ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="<?php echo esc_url( get_edit_post_link( $item->post_id ) ); ?>">
+                                        <?php echo esc_html( $item->post_title ); ?>
+                                    </a>
+                                </td>
                                 <td><?php echo esc_html( $item->created_at ); ?></td>
                                 <td>
                                     <?php 
