@@ -26,7 +26,7 @@ jQuery(document).ready(function($) {
                 giftBtn.prop('disabled', true).text('...');
             },
             success: function(response) {
-                giftBtn.prop('disabled', false).text('Hediye Et'); // Reset text will be updated if needed
+                giftBtn.prop('disabled', false).text(pms_gift_article_vars.i18n.button_text);
                 
                 if (response.success) {
                     linkInput.val(response.data.link);

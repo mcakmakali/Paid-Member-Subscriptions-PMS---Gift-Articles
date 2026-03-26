@@ -40,6 +40,7 @@ class PMS_Gift_Articles_Admin {
     public function register_settings() {
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_credits_per_month' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_token_expiry_days' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_button_text' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_enabled_post_types' );
     }
 
