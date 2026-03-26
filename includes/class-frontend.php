@@ -16,7 +16,6 @@ class PMS_Gift_Articles_Frontend {
     }
 
     private function __construct() {
-        add_filter( 'the_content', array( $this, 'inject_gift_button' ), 5 );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
         add_action( 'wp_footer', array( $this, 'render_modal' ) );
         add_shortcode( 'pms_gift_button', array( $this, 'render_shortcode' ) );

@@ -47,6 +47,12 @@ $activity = PMS_Gift_Articles_Admin::get_instance()->get_recent_activity();
     <h1><?php _e( 'Gift Articles Settings', 'pms-gift-articles' ); ?></h1>
 
     <div class="pms-gift-admin-wrap">
+        <div class="pms-gift-admin-section">
+            <h2><?php _e( 'Shortcode', 'pms-gift-articles' ); ?></h2>
+            <p><?php _e( 'Hediye et butonunu istediğiniz yere yerleştirmek için aşağıdaki shortcode\'u kullanın:', 'pms-gift-articles' ); ?></p>
+            <code>[pms_gift_button]</code>
+        </div>
+
         <form method="post" action="options.php" class="pms-gift-admin-section">
             <?php settings_fields( 'pms_gift_articles_settings' ); ?>
             
