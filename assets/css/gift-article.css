@@ -1,0 +1,96 @@
+.pms-gift-article-wrapper {
+    margin-bottom: 20px;
+}
+
+.pms-gift-article-btn {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+}
+
+.pms-gift-article-btn:hover {
+    background-color: #333;
+}
+
+/* Modal Styles */
+.pms-gift-modal {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.pms-gift-modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.pms-gift-modal-close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.pms-gift-modal-close:hover {
+    color: #000;
+}
+
+.pms-gift-link-container {
+    display: flex;
+    margin: 20px 0;
+}
+
+#pms-gift-link-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+}
+
+#pms-gift-copy-btn {
+    padding: 10px 20px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#pms-gift-copy-btn:hover {
+    background-color: #333;
+}
+
+#pms-gift-modal-feedback {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #059669;
+}
+
+#pms-gift-remaining-info {
+    margin-top: 15px;
+    font-size: 13px;
+    color: #666;
+}
