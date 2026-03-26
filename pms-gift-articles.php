@@ -4,7 +4,7 @@
  * Plugin URI:
  * Description: Allows subscribers to gift articles to non-subscribers via unique links. Integrates with Paid Member Subscriptions.
  * Version: 1.0.0
- * Author: Gemini CLI
+ * Author: Mehmet Ali ÇAKMAK
  * Text Domain: pms-gift-articles
  * Domain Path: /languages
  * Requires at least: 6.0

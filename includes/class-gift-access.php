@@ -16,23 +16,24 @@ class PMS_Gift_Articles_Gift_Access {
     }
 
     private function __construct() {
-        add_filter( 'pms_content_is_restricted', array( $this, 'bypass_pms_restriction' ), 10, 2 );
+        add_filter( 'user_has_cap', array( $this, 'grant_bypass_capability' ), 10, 3 );
         add_action( 'wp_head', array( $this, 'check_invalid_token_notice' ) );
     }
 
     /**
-     * Bypass PMS restriction if a valid gift token is present
+     * Grant bypass capability if a valid gift token is present
      */
-    public function bypass_pms_restriction( $is_restricted, $post_id ) {
-        if ( isset( $_GET['gift_article'] ) ) {
+    public function grant_bypass_capability( $allcaps, $caps, $args ) {
+        if ( is_singular() && isset( $_GET['gift_article'] ) ) {
             $token = sanitize_text_field( $_GET['gift_article'] );
+            $post_id = get_the_ID();
             
             if ( PMS_Gift_Articles_Tokens::validate( $token, $post_id ) ) {
-                return false; // Bypass restriction
+                $allcaps['pms_bypass_content_restriction'] = true;
             }
         }
 
-        return $is_restricted;
+        return $allcaps;
     }
 
     /**
