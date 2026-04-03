@@ -45,6 +45,10 @@ class PMS_Gift_Articles_Admin {
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_modal_desc' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_copy_success_msg' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_enabled_post_types' );
+        
+        // Article End Section Settings
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_section_title' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_section_desc' );
     }
 
     /**

@@ -43,16 +43,25 @@ class PMS_Gift_Articles_Ajax {
 
         $credits_obj = PMS_Gift_Articles_Credits::get_instance()->get_user_credits( $user_id );
         
-        if ( ! $credits_obj || $credits_obj->credits_remaining <= 0 ) {
-            wp_send_json_error( array( 'message' => __( 'Bu ayki hediye limitinize ulaştınız.', 'pms-gift-articles' ) ) );
+        // Check for existing token first
+        $token = PMS_Gift_Articles_Tokens::get_instance()->get_existing_token( $post_id, $user_id );
+        $is_new_token = false;
+
+        if ( ! $token ) {
+            if ( ! $credits_obj || $credits_obj->credits_remaining <= 0 ) {
+                wp_send_json_error( array( 'message' => __( 'Bu ayki hediye limitinize ulaştınız.', 'pms-gift-articles' ) ) );
+            }
+
+            // Generate new token
+            $token = PMS_Gift_Articles_Tokens::get_instance()->generate_token( $post_id, $user_id );
+            $is_new_token = true;
         }
 
-        // Generate token
-        $token = PMS_Gift_Articles_Tokens::get_instance()->generate_token( $post_id, $user_id );
-
         if ( $token ) {
-            // Deduct credit
-            PMS_Gift_Articles_Credits::get_instance()->deduct_credit( $user_id );
+            if ( $is_new_token ) {
+                // Deduct credit only for new tokens
+                PMS_Gift_Articles_Credits::get_instance()->deduct_credit( $user_id );
+            }
             
             $updated_credits = PMS_Gift_Articles_Credits::get_instance()->get_user_credits( $user_id );
             $gift_link = add_query_arg( 'gift_article', $token, get_permalink( $post_id ) );
@@ -60,7 +69,7 @@ class PMS_Gift_Articles_Ajax {
             wp_send_json_success( array(
                 'link'              => $gift_link,
                 'credits_remaining' => $updated_credits->credits_remaining,
-                'message'           => __( 'Link başarıyla oluşturuldu.', 'pms-gift-articles' )
+                'message'           => $is_new_token ? __( 'Link başarıyla oluşturuldu.', 'pms-gift-articles' ) : __( 'Mevcut linkiniz getirildi.', 'pms-gift-articles' )
             ) );
         }
 

@@ -51,6 +51,22 @@ class PMS_Gift_Articles_Tokens {
     }
 
     /**
+     * Get existing valid token for a user and post
+     */
+    public function get_existing_token( $post_id, $user_id ) {
+        global $wpdb;
+        $table = PMS_Gift_Articles_Database::get_tokens_table();
+        $now = current_time( 'mysql' );
+
+        return $wpdb->get_var( $wpdb->prepare(
+            "SELECT token FROM $table WHERE post_id = %d AND gifter_user_id = %d AND is_active = 1 AND expires_at > %s ORDER BY created_at DESC LIMIT 1",
+            $post_id,
+            $user_id,
+            $now
+        ) );
+    }
+
+    /**
      * Validate a token
      */
     public static function validate( $token, $post_id ) {
