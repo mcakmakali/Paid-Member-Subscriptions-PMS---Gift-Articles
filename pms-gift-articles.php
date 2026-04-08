@@ -3,7 +3,7 @@
  * Plugin Name: PMS Gift Articles
  * Plugin URI:
  * Description: Allows subscribers to gift articles to non-subscribers via unique links. Integrates with Paid Member Subscriptions.
- * Version: 1.0.5
+ * Version: 1.0.7
  * Author: Mehmet Ali ÇAKMAK
  * Author URI: https://mehmetalicakmak.me
  * Text Domain: pms-gift-articles

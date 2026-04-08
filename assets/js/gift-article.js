@@ -9,9 +9,9 @@ jQuery(document).ready(function($) {
         btn.find('.pms-gift-btn-text').text(text);
     }
 
-    // Open Modal and Generate Link - Using delegation to handle all buttons
+    // Generate Link - Using delegation to handle all buttons
     $(document).on('click', '.pms-gift-article-btn', function(e) {
-        // If it's a link (like in the footer), let it work normally unless it's the specific generate button
+        // If it's a link (like in the sticky footer), let it work normally
         if ($(this).attr('href') && $(this).attr('href') !== '#') {
             return;
         }
@@ -22,8 +22,12 @@ jQuery(document).ready(function($) {
         
         if (!postId) return; // Not a generate button
 
-        $('#pms-gift-modal-feedback').text('');
-        $('#pms-gift-link-input').val('');
+        var box = giftBtn.closest('.pms-gift-article-box');
+        var feedback = box.find('.pms-gift-action-feedback');
+        var linkInput = box.find('.pms-gift-link-input');
+        
+        feedback.text('');
+        linkInput.val('');
         
         $.ajax({
             url: pms_gift_article_vars.ajax_url,
@@ -40,20 +44,27 @@ jQuery(document).ready(function($) {
                 giftBtn.prop('disabled', false);
                 
                 if (response.success) {
-                    // Update ALL gift buttons on the page with new credit count
-                    $('.pms-gift-article-btn').each(function() {
-                        if ($(this).data('post-id')) {
-                            updateButtonText($(this), response.data.credits_remaining);
-                        }
-                    });
                     
-                    $('#pms-gift-link-input').val(response.data.link);
+                    // Set the input value
+                    linkInput.val(response.data.link);
+                    
+                    // Update remaining info
                     if (response.data.credits_remaining !== undefined) {
-                        $('#pms-gift-remaining-info').text(pms_gift_article_vars.i18n.remaining.replace('%d', response.data.credits_remaining));
+                        var remainingText = pms_gift_article_vars.i18n.remaining.replace('%d', response.data.credits_remaining);
+                        box.find('.pms-gift-remaining-info').text(remainingText);
+                        
+                        // Also update other buttons on page if any are still visible
+                        $('.pms-gift-article-btn').each(function() {
+                            if ($(this).data('post-id')) {
+                                updateButtonText($(this), response.data.credits_remaining);
+                            }
+                        });
                     }
+
+                    // Hide button wrapper, show inline link wrapper
+                    box.find('.pms-gift-btn-wrapper').hide();
+                    box.find('.pms-gift-inline-wrapper').fadeIn(300);
                     
-                    // Show modal using class for better reliability with !important CSS
-                    $('#pms-gift-modal').addClass('pms-active');
                 } else {
                     updateButtonText(giftBtn);
                     alert(response.data.message || pms_gift_article_vars.i18n.error);
@@ -68,26 +79,15 @@ jQuery(document).ready(function($) {
         });
     });
 
-    // Close Modal
-    $(document).on('click', '.pms-gift-modal-close', function() {
-        $('#pms-gift-modal').removeClass('pms-active');
-    });
-
-    // Close Modal when clicking outside
-    $(document).on('click', function(event) {
-        var modal = $('#pms-gift-modal');
-        if (modal.hasClass('pms-active') && $(event.target).is(modal)) {
-            modal.removeClass('pms-active');
-        }
-    });
-
-    // Copy to Clipboard
-    $(document).on('click', '#pms-gift-copy-btn', function() {
-        var linkInput = $('#pms-gift-link-input');
+    // Copy to Clipboard (Inline)
+    $(document).on('click', '.pms-gift-copy-btn', function() {
+        var box = $(this).closest('.pms-gift-article-box');
+        var linkInput = box.find('.pms-gift-link-input');
+        
         linkInput.select();
         document.execCommand('copy');
         
-        var feedback = $('#pms-gift-modal-feedback');
+        var feedback = box.find('.pms-gift-action-feedback');
         feedback.text(pms_gift_article_vars.i18n.copy_success).show();
         
         setTimeout(function() {

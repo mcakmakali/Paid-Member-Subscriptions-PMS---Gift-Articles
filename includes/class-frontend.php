@@ -17,7 +17,6 @@ class PMS_Gift_Articles_Frontend {
 
     private function __construct() {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-        add_action( 'wp_footer', array( $this, 'render_modal' ) );
         add_action( 'wp_footer', array( $this, 'render_gift_footer' ) );
         add_shortcode( 'pms_gift_button', array( $this, 'render_shortcode' ) );
         add_filter( 'the_content', array( $this, 'inject_gift_button' ) );
@@ -31,20 +30,63 @@ class PMS_Gift_Articles_Frontend {
             $post_id = get_the_ID();
         }
 
+        // 1. Giriş yapmamış kullanıcılar zaten göremez
         if ( ! is_user_logged_in() ) {
             return '';
         }
 
         $user_id = get_current_user_id();
-        
-        // Check if user is active PMS member
-        if ( ! function_exists( 'pms_is_member' ) || ! pms_is_member( $user_id ) ) {
+
+        /**
+         * PMS RESTRICTION CHECK (Pure PMS Functions)
+         */
+        if ( ! function_exists( 'pms_is_post_restricted' ) ) {
             return '';
         }
 
-        $credits_obj = PMS_Gift_Articles_Credits::get_instance()->get_user_credits( $user_id );
+        global $user_ID, $pms_is_post_restricted_arr;
+
+        // A. Mevcut kullanıcının (abone/admin) erişimi var mı?
+        // pms_is_post_restricted false dönerse kullanıcının erişimi VAR demektir.
+        $user_has_access = ! pms_is_post_restricted( $post_id );
+
+        if ( ! $user_has_access ) {
+            return ''; // Kullanıcı kendisi okuyamıyorsa hediye edemez.
+        }
+
+        // B. Bu yazı Premium mu? (Ziyaretçiler için kısıtlı mı?)
+        // PMS'e "Ziyaretçi (ID: 0) bu yazıyı okuyabilir mi?" diye soruyoruz.
+        $original_user_id = $user_ID;
+        $user_ID = 0; 
         
-        if ( ! $credits_obj || $credits_obj->credits_remaining <= 0 ) {
+        // Önbelleği (cache) bu kontrol için geçici olarak temizlemeliyiz
+        $cached_val = isset( $pms_is_post_restricted_arr[$post_id] ) ? $pms_is_post_restricted_arr[$post_id] : null;
+        unset( $pms_is_post_restricted_arr[$post_id] );
+
+        $is_premium = pms_is_post_restricted( $post_id );
+
+        // Global değerleri ve cache'i eski haline getiriyoruz
+        $user_ID = $original_user_id;
+        if ( $cached_val !== null ) {
+            $pms_is_post_restricted_arr[$post_id] = $cached_val;
+        } else {
+            unset( $pms_is_post_restricted_arr[$post_id] );
+        }
+
+        // // Eğer yazı bir ziyaretçi için kısıtlı değilse (herkese açıksa), Premium değildir.
+        // if ( ! $is_premium ) {
+        //     return '';
+        // }
+
+        /**
+         * Başarılı: Kullanıcı yetkili VE yazı premium.
+         */
+
+        $credits_obj = PMS_Gift_Articles_Credits::get_instance()->get_user_credits( $user_id );
+        $total_credits = get_option( 'pms_gift_articles_credits_per_month', 5 );
+        $remaining = $credits_obj ? $credits_obj->credits_remaining : $total_credits;
+        
+        if ( $remaining <= 0 ) {
             return '';
         }
 
@@ -52,9 +94,17 @@ class PMS_Gift_Articles_Frontend {
         $section_title = get_option( 'pms_gift_articles_section_title', __( 'Bu makaleyi hediye et', 'pms-gift-articles' ) );
         $section_desc  = get_option( 'pms_gift_articles_section_desc', __( 'Aboneliğinizle bu makaleyi sevdiklerinize hediye edebilirsiniz.', 'pms-gift-articles' ) );
 
+        $existing_token = PMS_Gift_Articles_Tokens::get_instance()->get_existing_token( $post_id, $user_id );
+        $gift_link = $existing_token ? add_query_arg( 'gift_article', $existing_token, get_permalink( $post_id ) ) : '';
+
+        $btn_display  = $existing_token ? 'style="display:none;"' : '';
+        $link_display = $existing_token ? '' : 'style="display:none;"';
+
         $button_html = '<div class="pms-gift-article-box">';
         $button_html .= sprintf( '<h3 class="pms-gift-box-title">%s</h3>', esc_html( $section_title ) );
         $button_html .= sprintf( '<p class="pms-gift-box-desc">%s</p>', esc_html( $section_desc ) );
+        
+        $button_html .= '<div class="pms-gift-btn-wrapper" ' . $btn_display . '>';
         $button_html .= sprintf(
             '<button class="pms-gift-article-btn" data-post-id="%d">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pms-gift-icon"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
@@ -63,9 +113,21 @@ class PMS_Gift_Articles_Frontend {
             $post_id,
             esc_html( $button_text ),
             __( 'kalan', 'pms-gift-articles' ),
-            $credits_obj->credits_remaining,
-            get_option( 'pms_gift_articles_credits_per_month', 5 )
+            $remaining,
+            $total_credits
         );
+        $button_html .= '</div>';
+
+        $button_html .= '<div class="pms-gift-inline-wrapper" ' . $link_display . '>';
+        $button_html .= '<div class="pms-gift-link-container">';
+        $button_html .= '<input type="text" class="pms-gift-link-input" value="' . esc_url( $gift_link ) . '" readonly>';
+        $button_html .= '<button class="pms-gift-copy-btn">' . __( 'Kopyala', 'pms-gift-articles' ) . '</button>';
+        $button_html .= '</div>';
+        $button_html .= '<div class="pms-gift-action-feedback"></div>';
+        $remaining_text = sprintf( __( 'Bu ay %d hediye hakkınız kaldı.', 'pms-gift-articles' ), $remaining );
+        $button_html .= '<p class="pms-gift-remaining-info">' . esc_html( $remaining_text ) . '</p>';
+        $button_html .= '</div>';
+
         $button_html .= '</div>';
 
         return $button_html;
@@ -93,7 +155,6 @@ class PMS_Gift_Articles_Frontend {
             return $content;
         }
 
-        // To prevent double button if shortcode is used
         if ( has_shortcode( $content, 'pms_gift_button' ) ) {
             return $content;
         }
@@ -128,60 +189,14 @@ class PMS_Gift_Articles_Frontend {
     }
 
     /**
-     * Render modal HTML in footer
-     */
-    public function render_modal() {
-        if ( ! is_user_logged_in() ) return;
-
-        // Sadece tekil yazı sayfalarında ve hediye butonu aktifse göster
-        if ( ! is_singular() ) return;
-
-        $user_id = get_current_user_id();
-        
-        // Sadece aktif üyeler hediye edebileceği için modalı sadece onlara yükle
-        if ( ! function_exists( 'pms_is_member' ) || ! pms_is_member( $user_id ) ) {
-            return;
-        }
-
-        $post_type = get_post_type();
-        $enabled_types = get_option( 'pms_gift_articles_enabled_post_types', array( 'post' ) );
-        
-        // Eğer bu yazı tipi için hediye etme kapalıysa ve içerikte shortcode yoksa yükleme
-        if ( ! in_array( $post_type, $enabled_types ) && ! has_shortcode( get_post()->post_content, 'pms_gift_button' ) ) {
-            return;
-        }
-
-        $modal_title = get_option( 'pms_gift_articles_modal_title', __( 'Makaleyi Hediye Et', 'pms-gift-articles' ) );
-        $modal_desc  = get_option( 'pms_gift_articles_modal_desc', __( 'Bu makaleyi hediye etmek için aşağıdaki linki kopyalayın:', 'pms-gift-articles' ) );
-
-        ?>
-        <div id="pms-gift-modal" class="pms-gift-modal">
-            <div class="pms-gift-modal-content">
-                <span class="pms-gift-modal-close">&times;</span>
-                <h3><?php echo esc_html( $modal_title ); ?></h3>
-                <p><?php echo esc_html( $modal_desc ); ?></p>
-                <div class="pms-gift-link-container">
-                    <input type="text" id="pms-gift-link-input" readonly>
-                    <button id="pms-gift-copy-btn"><?php _e( 'Kopyala', 'pms-gift-articles' ); ?></button>
-                </div>
-                <div id="pms-gift-modal-feedback"></div>
-                <p id="pms-gift-remaining-info"></p>
-            </div>
-        </div>
-        <?php
-    }
-
-    /**
      * Render gift sticky footer for visitors
      */
     public function render_gift_footer() {
-        // Show only if gift_article is present in URL
         if ( ! isset( $_GET['gift_article'] ) ) return;
 
         $token = sanitize_text_field( $_GET['gift_article'] );
         $post_id = get_the_ID();
 
-        // Validate token
         if ( ! PMS_Gift_Articles_Tokens::validate( $token, $post_id ) ) return;
 
         $footer_title    = get_option( 'pms_gift_articles_footer_title', __( 'Never miss a story from MediaCat.', 'pms-gift-articles' ) );
@@ -199,7 +214,7 @@ class PMS_Gift_Articles_Frontend {
             <div class="pms-footer-content-wrap">
                 <div class="pms-footer-expanded-content">
                     <div class="pms-footer-left">
-                        <h2 class="pms-footer-title"><?php echo esc_html( $footer_title ); ?></h2>
+                        <h2 class="pms-footer-title" ><?php echo esc_html( $footer_title ); ?></h2>
                         <p class="pms-footer-desc">
                             <?php echo esc_html( $footer_desc ); ?>
                             <br>
