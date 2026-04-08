@@ -11,10 +11,17 @@ jQuery(document).ready(function($) {
 
     // Open Modal and Generate Link - Using delegation to handle all buttons
     $(document).on('click', '.pms-gift-article-btn', function(e) {
+        // If it's a link (like in the footer), let it work normally unless it's the specific generate button
+        if ($(this).attr('href') && $(this).attr('href') !== '#') {
+            return;
+        }
+
         e.preventDefault();
         var giftBtn = $(this);
         var postId = giftBtn.data('post-id');
         
+        if (!postId) return; // Not a generate button
+
         $('#pms-gift-modal-feedback').text('');
         $('#pms-gift-link-input').val('');
         
@@ -35,7 +42,9 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     // Update ALL gift buttons on the page with new credit count
                     $('.pms-gift-article-btn').each(function() {
-                        updateButtonText($(this), response.data.credits_remaining);
+                        if ($(this).data('post-id')) {
+                            updateButtonText($(this), response.data.credits_remaining);
+                        }
                     });
                     
                     $('#pms-gift-link-input').val(response.data.link);
@@ -86,5 +95,11 @@ jQuery(document).ready(function($) {
                 $(this).text('');
             });
         }, 3000);
+    });
+
+    // Sticky Footer Toggle (Expand/Collapse)
+    $(document).on('click', '.pms-footer-toggle', function() {
+        var footer = $('#pms-gift-sticky-footer');
+        footer.toggleClass('pms-expanded pms-collapsed');
     });
 });

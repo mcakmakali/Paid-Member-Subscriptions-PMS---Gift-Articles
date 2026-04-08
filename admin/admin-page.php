@@ -10,9 +10,15 @@ $modal_title        = get_option( 'pms_gift_articles_modal_title', __( 'Makaleyi
 $modal_desc         = get_option( 'pms_gift_articles_modal_desc', __( 'Bu makaleyi hediye etmek için aşağıdaki linki kopyalayın:', 'pms-gift-articles' ) );
 $copy_success_msg   = get_option( 'pms_gift_articles_copy_success_msg', __( 'Link kopyalandı! Paylaşmaya hazır.', 'pms-gift-articles' ) );
 
-// New section texts
+// Article End Section Texts
 $section_title      = get_option( 'pms_gift_articles_section_title', __( 'Bu makaleyi hediye et', 'pms-gift-articles' ) );
 $section_desc       = get_option( 'pms_gift_articles_section_desc', __( 'Aboneliğinizle bu makaleyi sevdiklerinize hediye edebilirsiniz.', 'pms-gift-articles' ) );
+
+// Sticky Footer Section Texts
+$footer_title       = get_option( 'pms_gift_articles_footer_title', __( 'Never miss a story from MediaCat.', 'pms-gift-articles' ) );
+$footer_desc        = get_option( 'pms_gift_articles_footer_desc', __( 'This is your gift article. Get unlimited access to MediaCat.', 'pms-gift-articles' ) );
+$footer_btn_text    = get_option( 'pms_gift_articles_footer_btn_text', __( 'ABONE OL', 'pms-gift-articles' ) );
+$footer_btn_url     = get_option( 'pms_gift_articles_footer_btn_url', '#' );
 
 $enabled_post_types = get_option( 'pms_gift_articles_enabled_post_types', array( 'post' ) );
 $all_post_types     = get_post_types( array( 'public' => true ), 'objects' );
@@ -95,6 +101,26 @@ $activity = PMS_Gift_Articles_Admin::get_instance()->get_recent_activity();
                 </tr>
 
                 <tr>
+                    <th colspan="2"><h3><?php _e( 'Gift Visitor Sticky Footer', 'pms-gift-articles' ); ?></h3></th>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e( 'Footer Title', 'pms-gift-articles' ); ?></th>
+                    <td><input type="text" name="pms_gift_articles_footer_title" value="<?php echo esc_attr( $footer_title ); ?>" class="regular-text" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e( 'Footer Description', 'pms-gift-articles' ); ?></th>
+                    <td><textarea name="pms_gift_articles_footer_desc" class="regular-text" rows="2"><?php echo esc_textarea( $footer_desc ); ?></textarea></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e( 'Button Text', 'pms-gift-articles' ); ?></th>
+                    <td><input type="text" name="pms_gift_articles_footer_btn_text" value="<?php echo esc_attr( $footer_btn_text ); ?>" class="regular-text" /></td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row"><?php _e( 'Button URL', 'pms-gift-articles' ); ?></th>
+                    <td><input type="text" name="pms_gift_articles_footer_btn_url" value="<?php echo esc_attr( $footer_btn_url ); ?>" class="regular-text" /></td>
+                </tr>
+
+                <tr>
                     <th colspan="2"><h3><?php _e( 'Core Settings', 'pms-gift-articles' ); ?></h3></th>
                 </tr>
                 <tr valign="top">
@@ -122,7 +148,6 @@ $activity = PMS_Gift_Articles_Admin::get_instance()->get_recent_activity();
 
             <?php submit_button(); ?>
         </form>
-... (rest of the code)
 
         <div class="pms-gift-admin-section">
             <h2><?php _e( 'Recent Gift Activity', 'pms-gift-articles' ); ?></h2>

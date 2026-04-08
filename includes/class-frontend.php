@@ -18,6 +18,7 @@ class PMS_Gift_Articles_Frontend {
     private function __construct() {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
         add_action( 'wp_footer', array( $this, 'render_modal' ) );
+        add_action( 'wp_footer', array( $this, 'render_gift_footer' ) );
         add_shortcode( 'pms_gift_button', array( $this, 'render_shortcode' ) );
         add_filter( 'the_content', array( $this, 'inject_gift_button' ) );
     }
@@ -132,6 +133,24 @@ class PMS_Gift_Articles_Frontend {
     public function render_modal() {
         if ( ! is_user_logged_in() ) return;
 
+        // Sadece tekil yazı sayfalarında ve hediye butonu aktifse göster
+        if ( ! is_singular() ) return;
+
+        $user_id = get_current_user_id();
+        
+        // Sadece aktif üyeler hediye edebileceği için modalı sadece onlara yükle
+        if ( ! function_exists( 'pms_is_member' ) || ! pms_is_member( $user_id ) ) {
+            return;
+        }
+
+        $post_type = get_post_type();
+        $enabled_types = get_option( 'pms_gift_articles_enabled_post_types', array( 'post' ) );
+        
+        // Eğer bu yazı tipi için hediye etme kapalıysa ve içerikte shortcode yoksa yükleme
+        if ( ! in_array( $post_type, $enabled_types ) && ! has_shortcode( get_post()->post_content, 'pms_gift_button' ) ) {
+            return;
+        }
+
         $modal_title = get_option( 'pms_gift_articles_modal_title', __( 'Makaleyi Hediye Et', 'pms-gift-articles' ) );
         $modal_desc  = get_option( 'pms_gift_articles_modal_desc', __( 'Bu makaleyi hediye etmek için aşağıdaki linki kopyalayın:', 'pms-gift-articles' ) );
 
@@ -147,6 +166,59 @@ class PMS_Gift_Articles_Frontend {
                 </div>
                 <div id="pms-gift-modal-feedback"></div>
                 <p id="pms-gift-remaining-info"></p>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render gift sticky footer for visitors
+     */
+    public function render_gift_footer() {
+        // Show only if gift_article is present in URL
+        if ( ! isset( $_GET['gift_article'] ) ) return;
+
+        $token = sanitize_text_field( $_GET['gift_article'] );
+        $post_id = get_the_ID();
+
+        // Validate token
+        if ( ! PMS_Gift_Articles_Tokens::validate( $token, $post_id ) ) return;
+
+        $footer_title    = get_option( 'pms_gift_articles_footer_title', __( 'Never miss a story from MediaCat.', 'pms-gift-articles' ) );
+        $footer_desc     = get_option( 'pms_gift_articles_footer_desc', __( 'This is your gift article. Get unlimited access to MediaCat.', 'pms-gift-articles' ) );
+        $footer_btn_text = get_option( 'pms_gift_articles_footer_btn_text', __( 'ABONE OL', 'pms-gift-articles' ) );
+        $footer_btn_url  = get_option( 'pms_gift_articles_footer_btn_url', '#' );
+        $login_url       = do_shortcode( '[cognito_login_url]' );
+
+        ?>
+        <div id="pms-gift-sticky-footer" class="pms-gift-sticky-footer pms-expanded">
+            <div class="pms-footer-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            
+            <div class="pms-footer-content-wrap">
+                <div class="pms-footer-expanded-content">
+                    <div class="pms-footer-left">
+                        <h2 class="pms-footer-title"><?php echo esc_html( $footer_title ); ?></h2>
+                        <p class="pms-footer-desc">
+                            <?php echo esc_html( $footer_desc ); ?>
+                            <br>
+                            <span>Zaten abone misiniz? <a href="<?php echo esc_url( $login_url ); ?>">Giriş yapın</a></span>
+                        </p>
+                    </div>
+                    <div class="pms-footer-right">
+                        <a href="<?php echo esc_url( $footer_btn_url ); ?>" class="pms-gift-article-btn pms-footer-btn"><?php echo esc_html( $footer_btn_text ); ?></a>
+                    </div>
+                </div>
+
+                <div class="pms-footer-collapsed-content">
+                    <div class="pms-footer-collapsed-left">
+                         <a href="<?php echo esc_url( $login_url ); ?>" class="pms-footer-login-link">GİRİŞ YAP</a>
+                    </div>
+                    <div class="pms-footer-collapsed-right">
+                        <a href="<?php echo esc_url( $footer_btn_url ); ?>" class="pms-gift-article-btn pms-footer-btn"><?php echo esc_html( $footer_btn_text ); ?></a>
+                    </div>
+                </div>
             </div>
         </div>
         <?php

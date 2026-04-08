@@ -49,6 +49,12 @@ class PMS_Gift_Articles_Admin {
         // Article End Section Settings
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_section_title' );
         register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_section_desc' );
+
+        // Sticky Footer Settings for Gift Visitors
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_footer_title' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_footer_desc' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_footer_btn_text' );
+        register_setting( 'pms_gift_articles_settings', 'pms_gift_articles_footer_btn_url' );
     }
 
     /**

@@ -43,6 +43,7 @@
     border-color: #232323;
     transition: all 0.2s ease;
     text-transform: uppercase;
+    text-decoration: none;
 }
 
 .pms-gift-article-btn:hover {
@@ -66,7 +67,6 @@
     background-color: rgba(0,0,0,0.7) !important;
 }
 
-/* We will use display: flex when active to center content */
 .pms-gift-modal.pms-active {
     display: flex !important;
     align-items: center !important;
@@ -94,56 +94,152 @@
     line-height: 1 !important;
 }
 
-.pms-gift-modal-close:hover {
-    color: #ef4444 !important;
+/* Sticky Footer Styles */
+.pms-gift-sticky-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    border-top: 2px solid #232323;
+    z-index: 999998;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    transition: all 0.4s ease-in-out;
+    max-height: 500px; /* Geniş hali için yeterli yükseklik */
 }
 
-.pms-gift-link-container {
-    display: flex !important;
-    margin: 25px 0 !important;
-    border: 1px solid #232323 !important;
+/* Daralmış modda transform kullanmak yerine yüksekliği kısıtlıyoruz */
+.pms-gift-sticky-footer.pms-collapsed {
+    max-height: 80px; 
 }
 
-#pms-gift-link-input {
-    flex-grow: 1 !important;
-    padding: 12px !important;
-    border: none !important;
-    font-size: 14px !important;
-    background: #f9f9f9 !important;
-    color: #232323 !important;
-    outline: none !important;
-    width: 100% !important;
+.pms-footer-content-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 25px 20px;
+    position: relative;
 }
 
-#pms-gift-copy-btn {
-    padding: 12px 25px !important;
-    background-color: #232323 !important;
-    color: #fff !important;
-    border: none !important;
-    cursor: pointer !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    white-space: nowrap !important;
+.pms-collapsed .pms-footer-content-wrap {
+    padding: 15px 20px;
 }
 
-#pms-gift-copy-btn:hover {
-    background-color: #444 !important;
+.pms-footer-expanded-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: opacity 0.3s;
+    opacity: 1;
 }
 
-#pms-gift-modal-feedback {
-    margin-top: 10px !important;
-    font-weight: 600 !important;
-    color: #059669 !important;
-    font-size: 14px !important;
-    text-align: center !important;
-    min-height: 20px !important;
+.pms-collapsed .pms-footer-expanded-content {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    padding: 0;
 }
 
-#pms-gift-remaining-info {
-    margin-top: 20px !important;
-    font-size: 13px !important;
-    color: #666 !important;
-    text-align: center !important;
-    border-top: 1px solid #eee !important;
-    padding-top: 15px !important;
+.pms-footer-collapsed-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s;
+}
+
+.pms-collapsed .pms-footer-collapsed-content {
+    opacity: 1;
+    height: 50px;
+    pointer-events: auto;
+}
+
+.pms-footer-left {
+    flex: 1;
+}
+
+.pms-footer-title {
+    font-family: 'Elephant-Medium', sans-serif;
+    font-size: 26px;
+    margin: 0 0 15px 0;
+    color: #232323;
+    line-height: 1.2;
+}
+
+.pms-footer-desc {
+    font-size: 15px;
+    color: #555;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.pms-footer-desc a {
+    color: #232323;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.pms-footer-right {
+    margin-left: 40px;
+}
+
+.pms-footer-toggle {
+    position: absolute;
+    right: 20px;
+    top: -40px;
+    background: #fff;
+    border: 2px solid #232323;
+    border-bottom: none;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.pms-collapsed .pms-footer-toggle svg {
+    transform: rotate(180deg);
+}
+
+.pms-footer-login-link {
+    color: #232323;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 2px solid #232323;
+    display: inline-block;
+    padding-bottom: 2px;
+}
+
+.pms-footer-btn {
+    white-space: nowrap;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .pms-footer-expanded-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    .pms-footer-right {
+        margin-left: 0;
+        margin-top: 20px;
+        width: 100%;
+    }
+    .pms-footer-right .pms-footer-btn {
+        width: 100%;
+    }
+    .pms-footer-title {
+        font-size: 20px;
+    }
+    .pms-footer-content-wrap {
+        padding: 20px 15px;
+    }
+    .pms-collapsed .pms-footer-collapsed-content {
+        height: auto;
+        min-height: 50px;
+    }
 }
