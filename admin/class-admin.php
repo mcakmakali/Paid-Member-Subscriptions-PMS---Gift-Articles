@@ -16,16 +16,19 @@ class PMS_Gift_Articles_Admin {
     }
 
     private function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
+        add_action( 'admin_menu', array( $this, 'add_settings_page' ), 20 ); // Priority 20 to ensure PMS menu is already loaded
         add_action( 'admin_init', array( $this, 'register_settings' ) );
         add_action( 'wp_ajax_pms_admin_reset_credits', array( $this, 'ajax_reset_user_credits' ) );
     }
 
     /**
-     * Add settings page under Settings > Gift Articles
+     * Add settings page under Paid Member Subscriptions menu
      */
     public function add_settings_page() {
-        add_options_page(
+        // PMS'in ana menü slug'ı genellikle 'pms-members-page' dir.
+        // Oraya alt menü olarak ekliyoruz.
+        add_submenu_page(
+            'paid-member-subscriptions',
             __( 'Gift Articles Settings', 'pms-gift-articles' ),
             __( 'Gift Articles', 'pms-gift-articles' ),
             'manage_options',
