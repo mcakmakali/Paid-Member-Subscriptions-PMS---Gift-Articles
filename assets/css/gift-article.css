@@ -112,6 +112,12 @@
     color: #666;
 }
 
+.pms-gift-renewal-info {
+    font-size: 11px;
+    color: #999;
+    font-style: italic;
+}
+
 /* Sticky Footer Styles */
 .pms-gift-sticky-footer {
     position: fixed;
