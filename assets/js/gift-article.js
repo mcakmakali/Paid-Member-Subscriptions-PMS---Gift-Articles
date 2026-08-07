@@ -51,7 +51,7 @@ jQuery(document).ready(function($) {
                     // Update remaining info
                     if (response.data.credits_remaining !== undefined) {
                         var remainingText = pms_gift_article_vars.i18n.remaining.replace('%d', response.data.credits_remaining);
-                        box.find('.pms-gift-remaining-info').text(remainingText);
+                        box.find('.pms-gift-remaining-count').text(remainingText);
                         
                         // Also update other buttons on page if any are still visible
                         $('.pms-gift-article-btn').each(function() {

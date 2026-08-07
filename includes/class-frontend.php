@@ -125,12 +125,13 @@ class PMS_Gift_Articles_Frontend {
 
         // Kalan hak / yenilenme bilgisi her zaman gösterilir, buton/link durumundan bağımsız.
         $remaining_text = sprintf( __( 'Bu ay %d hediye hakkınız kaldı.', 'pms-gift-articles' ), $remaining );
-        $button_html   .= '<p class="pms-gift-remaining-info">' . esc_html( $remaining_text );
+        $button_html   .= '<p class="pms-gift-remaining-info">';
+        $button_html   .= '<span class="pms-gift-remaining-count">' . esc_html( $remaining_text ) . '</span>';
 
         if ( $credits_obj && ! empty( $credits_obj->period_start ) ) {
             $next_reset_ts = strtotime( '+30 days', strtotime( $credits_obj->period_start ) );
-            $renewal_text  = sprintf( __( 'Haklarınız %s tarihinde yenilenecek.', 'pms-gift-articles' ), date_i18n( 'd F Y', $next_reset_ts ) );
-            $button_html  .=  esc_html( $renewal_text ) ;
+            $renewal_text  = sprintf( __( ' Haklarınız %s tarihinde yenilenecek.', 'pms-gift-articles' ), date_i18n( 'd F Y', $next_reset_ts ) );
+            $button_html  .= '<span class="pms-gift-renewal-info">' . esc_html( $renewal_text ) . '</span>';
         }
 
         $button_html .= '</p>';
