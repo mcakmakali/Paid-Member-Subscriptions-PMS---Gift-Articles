@@ -85,10 +85,6 @@ class PMS_Gift_Articles_Frontend {
         $credits_obj = PMS_Gift_Articles_Credits::get_instance()->get_user_credits( $user_id );
         $total_credits = get_option( 'pms_gift_articles_credits_per_month', 5 );
         $remaining = $credits_obj ? $credits_obj->credits_remaining : $total_credits;
-        
-        if ( $remaining <= 0 ) {
-            return '';
-        }
 
         $button_text   = get_option( 'pms_gift_articles_button_text', __( 'Hediye Et', 'pms-gift-articles' ) );
         $section_title = get_option( 'pms_gift_articles_section_title', __( 'Bu makaleyi hediye et', 'pms-gift-articles' ) );
@@ -97,7 +93,8 @@ class PMS_Gift_Articles_Frontend {
         $existing_token = PMS_Gift_Articles_Tokens::get_instance()->get_existing_token( $post_id, $user_id );
         $gift_link = $existing_token ? add_query_arg( 'gift_article', $existing_token, get_permalink( $post_id ) ) : '';
 
-        $btn_display  = $existing_token ? 'style="display:none;"' : '';
+        // Hak kalmadıysa "Hediye Et" butonu tıklanamaz olsun, ama kalan hak/yenilenme bilgisi yine de gösterilsin.
+        $btn_display  = ( $existing_token || $remaining <= 0 ) ? 'style="display:none;"' : '';
         $link_display = $existing_token ? '' : 'style="display:none;"';
 
         $button_html = '<div class="pms-gift-article-box">';
@@ -124,6 +121,9 @@ class PMS_Gift_Articles_Frontend {
         $button_html .= '<button class="pms-gift-copy-btn">' . __( 'Kopyala', 'pms-gift-articles' ) . '</button>';
         $button_html .= '</div>';
         $button_html .= '<div class="pms-gift-action-feedback"></div>';
+        $button_html .= '</div>';
+
+        // Kalan hak / yenilenme bilgisi her zaman gösterilir, buton/link durumundan bağımsız.
         $remaining_text = sprintf( __( 'Bu ay %d hediye hakkınız kaldı.', 'pms-gift-articles' ), $remaining );
         $button_html   .= '<p class="pms-gift-remaining-info">' . esc_html( $remaining_text );
 
@@ -134,7 +134,6 @@ class PMS_Gift_Articles_Frontend {
         }
 
         $button_html .= '</p>';
-        $button_html .= '</div>';
 
         $button_html .= '</div>';
 
