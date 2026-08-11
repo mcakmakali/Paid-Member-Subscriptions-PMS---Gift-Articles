@@ -37,6 +37,11 @@ class PMS_Gift_Articles_Frontend {
 
         $user_id = get_current_user_id();
 
+        // 1b. Sadece aktif abonelere gösterilsin (AJAX tarafındaki kontrolle aynı, class-ajax.php).
+        if ( ! function_exists( 'pms_is_member' ) || ! pms_is_member( $user_id ) ) {
+            return '';
+        }
+
         /**
          * PMS RESTRICTION CHECK (Pure PMS Functions)
          */
@@ -176,6 +181,11 @@ class PMS_Gift_Articles_Frontend {
      * Enqueue assets
      */
     public function enqueue_assets() {
+        // Giriş yapmamış veya aktif abone olmayan kullanıcıya buton hiç gösterilmediği için JS/nonce de yüklenmesin.
+        if ( ! is_user_logged_in() ) return;
+
+        if ( ! function_exists( 'pms_is_member' ) || ! pms_is_member( get_current_user_id() ) ) return;
+
         if ( ! is_singular() && ! has_shortcode( get_post()->post_content, 'pms_gift_button' ) ) return;
 
         wp_enqueue_style( 'pms-gift-article-css', PMS_GIFT_ARTICLES_URL . 'assets/css/gift-article.css', array(), PMS_GIFT_ARTICLES_VERSION );
